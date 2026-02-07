@@ -119,7 +119,7 @@ class CoverLetterUI:
     def create_interface(self) -> gr.Blocks:
         """Create and return the Gradio interface."""
         
-        with gr.Blocks(title="Cover Letter Generator", theme=gr.themes.Soft()) as interface:
+        with gr.Blocks(title="Cover Letter Generator") as interface:
             gr.Markdown("# 📝 Personalized Cover Letter Generator")
             gr.Markdown("Generate tailored cover letters using AI based on your resume and job descriptions.")
             
@@ -194,7 +194,7 @@ class CoverLetterUI:
     def launch(self, **kwargs):
         """Launch the Gradio interface."""
         interface = self.create_interface()
-        interface.launch(**kwargs)
+        interface.launch(theme=gr.themes.Soft(), **kwargs)
 
 
 def main():

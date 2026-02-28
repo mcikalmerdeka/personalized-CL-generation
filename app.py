@@ -1,5 +1,5 @@
 """
-Main application entry point for the Cover Letter Generator.
+Main application entry point for ApplyCopilot.
 Run this file to start the Gradio interface.
 """
 

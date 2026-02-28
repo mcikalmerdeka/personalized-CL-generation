@@ -5,6 +5,7 @@ An intelligent tool that helps you throughout your job application process. Appl
 ## 🚀 Features
 
 ### 📝 Cover Letter Generator
+
 - **Dual Resume Support**: Supports both AI Engineer and Data-related role resumes
 - **Resume Analysis**: Automatically extracts relevant skills and experiences using FAISS vector search
 - **Style Matching**: Learns from multiple cover letter examples to maintain consistent writing style
@@ -12,6 +13,7 @@ An intelligent tool that helps you throughout your job application process. Appl
 - **PDF & Text Export**: Creates professional documents in multiple formats
 
 ### 💬 Employer Q&A Assistant
+
 - **Interactive Chatbot**: Answer employer and recruiter questions based on your indexed resume
 - **Context-Aware Responses**: Uses RAG (Retrieval-Augmented Generation) to provide accurate answers from your resume
 - **Professional Tone**: Maintains a professional and helpful tone in all responses
@@ -19,6 +21,7 @@ An intelligent tool that helps you throughout your job application process. Appl
 - **Persistent Chat**: Clear and restart conversations as needed
 
 ### 🎨 User Interface
+
 - **Tabbed Interface**: Easy switching between Cover Letter Generator and Employer Q&A modes
 - **Web-Based**: User-friendly Gradio interface accessible in your browser
 - **Real-time Feedback**: Status messages and progress indicators
@@ -37,6 +40,7 @@ An intelligent tool that helps you throughout your job application process. Appl
 ## 🧩 How It Works
 
 ### Cover Letter Generation
+
 1. **Document Processing**:
    - Loads your resume from PDF
    - Splits content into manageable chunks
@@ -48,7 +52,7 @@ An intelligent tool that helps you throughout your job application process. Appl
 
 3. **Content Generation**:
    - Retrieves relevant resume sections based on job description
-   - Generates tailored content using LLM (GPT-4o Mini)
+   - Generates tailored content using LLM (GPT-4.1 Mini)
    - Maintains your personal writing style and format
 
 4. **Document Creation**:
@@ -56,6 +60,7 @@ An intelligent tool that helps you throughout your job application process. Appl
    - Outputs a ready-to-submit PDF or TXT document
 
 ### Employer Q&A Assistant
+
 1. **Resume Indexing**:
    - Indexes your resume into a searchable vector store
    - Creates semantic embeddings for efficient retrieval
@@ -146,6 +151,7 @@ This will launch the Gradio web interface at `http://127.0.0.1:7860`
 ### Example Use Cases
 
 **Cover Letter Generation**:
+
 ```python
 from src.core.generator import CoverLetterGenerator
 from src.core.vector_store import VectorStoreManager
@@ -181,6 +187,7 @@ file_path = generator.save_cover_letter(
 ```
 
 **Employer Q&A Chatbot**:
+
 ```python
 from src.core.chatbot import EmployerQAChatbot
 from src.core.vector_store import VectorStoreManager
@@ -243,7 +250,3 @@ print(response)
 ## 📝 License
 
 This project is open source and available under the [MIT License](LICENSE).
-
----
-
-**Made with ❤️ by Muhammad Cikal Merdeka**

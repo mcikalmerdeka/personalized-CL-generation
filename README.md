@@ -14,15 +14,18 @@ An intelligent tool that helps you throughout your job application process. Appl
 
 ### 💬 Employer Q&A Assistant
 
-- **Interactive Chatbot**: Answer employer and recruiter questions based on your indexed resume
+- **Interactive Chatbot**: Answer employer and recruiter questions based on your indexed resume and job context
 - **Context-Aware Responses**: Uses RAG (Retrieval-Augmented Generation) to provide accurate answers from your resume
+- **Job-Specific Tailoring**: When job details are saved, responses are tailored to the specific position and company
 - **Professional Tone**: Maintains a professional and helpful tone in all responses
 - **Practice Mode**: Includes example questions to help you prepare for interviews
 - **Persistent Chat**: Clear and restart conversations as needed
 
 ### 🎨 User Interface
 
-- **Tabbed Interface**: Easy switching between Cover Letter Generator and Employer Q&A modes
+- **Setup-First Workflow**: Centralized Setup section for selecting resume type and entering job details (shared across all features)
+- **Tabbed Features**: Easy switching between Cover Letter Generator and Employer Q&A modes
+- **Shared State**: Resume and job details persist across tabs - no need to re-enter information
 - **Web-Based**: User-friendly Gradio interface accessible in your browser
 - **Real-time Feedback**: Status messages and progress indicators
 
@@ -62,18 +65,21 @@ An intelligent tool that helps you throughout your job application process. Appl
 ### Employer Q&A Assistant
 
 1. **Resume Indexing**:
-   - Indexes your resume into a searchable vector store
-   - Creates semantic embeddings for efficient retrieval
+    - Indexes your resume into a searchable vector store
+    - Creates semantic embeddings for efficient retrieval
+    - Job details are saved separately to provide context
 
 2. **Question Answering**:
-   - Retrieves relevant context from your resume based on the question
-   - Generates professional responses using the retrieved information
-   - Maintains conversation history for context-aware responses
+    - Retrieves relevant context from your resume based on the question
+    - Considers job context (company name, position) to tailor responses
+    - Generates professional responses using the retrieved information
+    - When job details are available, emphasizes fit for the specific role
+    - Maintains conversation history for context-aware responses
 
 3. **Interactive Chat**:
-   - Real-time chat interface with employers/recruiters
-   - Example questions to practice your responses
-   - Easy conversation management (clear, save)
+    - Real-time chat interface with employers/recruiters
+    - Example questions to practice your responses
+    - Easy conversation management (clear, save)
 
 ## 📋 Requirements
 
@@ -125,27 +131,37 @@ This will launch the Gradio web interface at `http://127.0.0.1:7860`
 
 ### Using the Web Interface
 
-#### Tab 1: 📝 Cover Letter Generator
+#### 🔧 Step 1: Setup (Complete This First)
+
+Before using any features, complete the Setup section at the top:
 
 1. **Select Resume Type**: Choose between "AI Engineer" or "Data Related" resume
-2. **Index Resume**: Click "Index Resume" to create/load the vector store
-3. **Enter Job Details**:
+2. **Index Resume**: Click "📁 Index Resume" to create/load the vector store
+3. **Enter Job Details** (shared for all features):
    - Company Name
    - Job Title
    - Full Job Description
-4. **Generate**: Click "Generate Cover Letter" to create your personalized cover letter
-5. **Download**: Download the generated cover letter in TXT or PDF format
+4. **Save Job Details**: Click "💾 Save Job Details" to make them available to both features
+
+#### Tab 1: 📝 Cover Letter Generator
+
+After completing Setup:
+
+1. **Choose Output Format**: Select TXT or PDF
+2. **Generate**: Click "✨ Generate Cover Letter" to create your personalized cover letter
+3. **Download**: Download the generated cover letter from the output section
 
 #### Tab 2: 💬 Employer Q&A Assistant
 
-1. **Select Resume Type**: Choose which resume to use for answering questions
-2. **Load Resume**: Click "Load Resume" to index your resume for the chatbot
-3. **Start Chatting**:
+After completing Setup:
+
+1. **Verify Context**: Check the "Current Context" status to confirm resume and job details are loaded
+2. **Start Chatting**:
    - Type employer questions in the chat box
    - Or click on example questions to practice
-   - The AI will answer based on your resume content
-4. **Manage Conversations**:
-   - Use "Clear Chat" to start a new conversation
+   - The AI will answer based on your resume content, tailored to the specific job
+3. **Manage Conversations**:
+   - Use "🗑️ Clear Chat" to start a new conversation
    - Review your chat history for reference
 
 ### Example Use Cases

@@ -123,7 +123,7 @@ class CoverLetterGenerator:
             raise
     
     def save_cover_letter(self, cover_letter: str, company_name: str, 
-                         job_title: str, format: str = "txt") -> str:
+                          job_title: str, format: str = "txt") -> str:
         """
         Save the generated cover letter to a file.
         
@@ -140,7 +140,11 @@ class CoverLetterGenerator:
             output_dir = Path(OUTPUT_DIR)
             output_dir.mkdir(parents=True, exist_ok=True)
             
-            filename = f"Cover_Letter_Muhammad_Cikal_Merdeka_{company_name}_{job_title}".replace(" ", "_")
+            # Sanitize company_name and job_title to remove path separators and invalid chars
+            safe_company = company_name.replace("/", "_").replace("\\", "_").replace(".", "_")
+            safe_job = job_title.replace("/", "_").replace("\\", "_").replace(".", "_")
+            
+            filename = f"Cover_Letter_Muhammad_Cikal_Merdeka_{safe_company}_{safe_job}".replace(" ", "_")
             
             if format.lower() == "pdf":
                 file_path = output_dir / f"{filename}.pdf"

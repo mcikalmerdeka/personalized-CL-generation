@@ -16,7 +16,7 @@ data/resumes/
 data/cover_letter_examples/
 
 # Output files
-# data/output/
+data/output/
 
 # Logs
 *.log

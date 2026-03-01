@@ -122,6 +122,11 @@ class VectorStoreManager:
             logger.error(f"Error searching vector store: {str(e)}")
             raise
     
+    def clear_vector_store(self) -> None:
+        """Clear the vector store from memory."""
+        self.vector_store = None
+        logger.info("Vector store cleared from memory")
+    
     def get_retriever(self, k: int = TOP_K_RESULTS):
         """
         Get a retriever for the vector store.

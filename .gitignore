@@ -9,7 +9,7 @@ __pycache__/
 *.so
 
 # Vector stores
-# data/vector_stores/
+data/vector_stores/
 
 # # Personal files
 data/resumes/

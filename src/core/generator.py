@@ -14,8 +14,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 
 from src.config.logging_config import setup_logger
 from src.config.settings import (LLM_MODEL, MAX_WORDS, COVER_LETTER_EXAMPLES_DIR, 
-                                 OUTPUT_DIR, CANDIDATE_NAME, RESUME_AI_LINK, 
-                                 RESUME_DATA_LINK, GITHUB_LINK, WEBSITE_LINK)
+                                 OUTPUT_DIR, CANDIDATE_NAME, GITHUB_LINK, WEBSITE_LINK)
 from src.config.prompts import get_cover_letter_prompt, get_cold_message_prompt
 from src.core.vector_store import VectorStoreManager
 
@@ -219,7 +218,7 @@ class CoverLetterGenerator:
     
     def generate_cold_message(self, job_description: str, company_name: str, 
                              job_title: str, contact_name: str, contact_position: str,
-                             resume_type: str) -> str:
+                             resume_link: str) -> str:
         """
         Generate a concise cold message for reaching out to a contact person.
         
@@ -229,19 +228,13 @@ class CoverLetterGenerator:
             job_title: Title of the position
             contact_name: Name of the contact person
             contact_position: Position/title of the contact person (e.g., "HR Manager", "Tech Lead")
-            resume_type: Type of resume ('AI Engineer' or 'Data Related')
+            resume_link: Link to the resume (Google Drive or other URL)
         
         Returns:
             Generated cold message text
         """
         try:
             logger.info(f"Generating cold message for {contact_name} ({contact_position}) at {company_name}")
-            
-            # Select appropriate resume link
-            if resume_type == "AI Engineer":
-                resume_link = RESUME_AI_LINK
-            else:
-                resume_link = RESUME_DATA_LINK
             
             # Get the prompt template with pre-filled candidate info
             template = get_cold_message_prompt(

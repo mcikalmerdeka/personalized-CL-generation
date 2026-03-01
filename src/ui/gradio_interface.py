@@ -1,4 +1,5 @@
 import os
+import shutil
 from pathlib import Path
 import gradio as gr
 from dotenv import load_dotenv
@@ -23,7 +24,7 @@ class ApplyCopilotUI:
         self.chatbot = EmployerQAChatbot(self.generator.vector_store_manager)
         
         # Shared state
-        self.current_resume_type = None
+        self.current_resume_path = None
         self.job_details = {
             "company_name": "",
             "job_title": "",
@@ -32,44 +33,58 @@ class ApplyCopilotUI:
         
         logger.info("Initialized ApplyCopilotUI")
     
-    def index_resume(self, resume_type: str) -> str:
+    def index_resume(self, resume_file) -> str:
         """
-        Index a resume and create/load vector store.
+        Index a resume from uploaded file and create vector store.
         
         Args:
-            resume_type: Type of resume ('AI Engineer' or 'Data Related')
+            resume_file: The uploaded resume file (Gradio file object)
         
         Returns:
             Status message
         """
         try:
-            # Map resume type to file
-            resume_files = {
-                "AI Engineer": "ai_engineer_resume.pdf",
-                "Data Related": "data_related_resume.pdf"
-            }
+            if resume_file is None:
+                return "❌ Please upload a resume file first."
             
-            if resume_type not in resume_files:
-                return f"❌ Invalid resume type: {resume_type}"
-            
-            resume_path = Path(RESUMES_DIR) / resume_files[resume_type]
-            vector_store_path = Path(VECTOR_STORES_DIR) / resume_type.lower().replace(" ", "_")
-            
-            # Check if vector store exists
-            if vector_store_path.exists():
-                logger.info(f"Loading existing vector store for {resume_type}")
-                self.generator.vector_store_manager.load_vector_store(str(vector_store_path))
-                message = f"✅ Loaded existing vector store for {resume_type}"
+            # Handle Gradio file upload - resume_file is a file path or dict
+            if isinstance(resume_file, dict):
+                uploaded_path = resume_file.get('name')
+            elif isinstance(resume_file, str):
+                uploaded_path = resume_file
             else:
-                logger.info(f"Creating new vector store for {resume_type}")
-                self.generator.vector_store_manager.load_and_index_resume(str(resume_path))
-                self.generator.vector_store_manager.save_vector_store(str(vector_store_path))
-                message = f"✅ Created and saved vector store for {resume_type}"
+                return f"❌ Invalid file format. Please upload a PDF file."
+            
+            if not uploaded_path or not os.path.exists(uploaded_path):
+                return "❌ Error: Could not access uploaded file."
+            
+            # Copy uploaded file to resumes directory with timestamp to avoid conflicts
+            import time
+            timestamp = int(time.time())
+            resume_filename = f"uploaded_resume_{timestamp}.pdf"
+            resume_path = Path(RESUMES_DIR) / resume_filename
+            
+            # Copy the uploaded file to our data directory
+            shutil.copy2(uploaded_path, resume_path)
+            logger.info(f"Saved uploaded resume to: {resume_path}")
+            
+            # Always create fresh vector store - delete any existing temp stores
+            temp_vector_path = Path(VECTOR_STORES_DIR) / f"temp_{timestamp}"
+            if temp_vector_path.exists():
+                shutil.rmtree(temp_vector_path)
+            
+            # Load and index the resume (always fresh)
+            logger.info(f"Creating new vector store for uploaded resume")
+            self.generator.vector_store_manager.load_and_index_resume(str(resume_path))
+            self.generator.vector_store_manager.save_vector_store(str(temp_vector_path))
+            
+            # Store the current resume path
+            self.current_resume_path = str(resume_path)
             
             # Load cover letter examples
             self.generator.load_cover_letter_examples()
-            self.current_resume_type = resume_type
             
+            message = f"✅ Resume indexed successfully: {Path(uploaded_path).name}"
             logger.info(message)
             return message
             
@@ -77,6 +92,77 @@ class ApplyCopilotUI:
             error_msg = f"❌ Error indexing resume: {str(e)}"
             logger.error(error_msg)
             return error_msg
+    
+    def restart_application(self) -> tuple:
+        """
+        Restart the application by clearing all state and deleting temporary files.
+        
+        Returns:
+            Tuple of cleared values for UI components
+        """
+        try:
+            # Clear vector store
+            self.generator.vector_store_manager.clear_vector_store()
+            
+            # Clear chatbot history
+            self.chatbot.clear_history()
+            self.chatbot.clear_job_context()
+            
+            # Clear job details
+            self.job_details = {
+                "company_name": "",
+                "job_title": "",
+                "job_description": ""
+            }
+            
+            # Clear resume path
+            self.current_resume_path = None
+            
+            # Clean up temporary vector stores
+            if VECTOR_STORES_DIR.exists():
+                for item in VECTOR_STORES_DIR.iterdir():
+                    if item.is_dir() and item.name.startswith("temp_"):
+                        try:
+                            shutil.rmtree(item)
+                            logger.info(f"Deleted temporary vector store: {item}")
+                        except Exception as e:
+                            logger.warning(f"Could not delete {item}: {e}")
+            
+            # Clean up uploaded resumes
+            if RESUMES_DIR.exists():
+                for item in RESUMES_DIR.iterdir():
+                    if item.is_file() and item.name.startswith("uploaded_resume_"):
+                        try:
+                            item.unlink()
+                            logger.info(f"Deleted uploaded resume: {item}")
+                        except Exception as e:
+                            logger.warning(f"Could not delete {item}: {e}")
+            
+            logger.info("Application restarted successfully")
+            return (
+                "🔄 Application restarted. Please upload a new resume and enter job details.",  # index_status
+                "No job details saved yet.",   # job_status
+                "❌ No context loaded. Please upload a resume and enter job details.",  # qa_context_status
+                None,   # resume_upload (clear file)
+                "",     # company_name
+                "",     # job_title
+                "",     # job_description
+                []      # chatbot (clear chat history)
+            )
+            
+        except Exception as e:
+            error_msg = f"❌ Error restarting application: {str(e)}"
+            logger.error(error_msg)
+            return (
+                error_msg,
+                "",
+                "",
+                None,
+                "",
+                "",
+                "",
+                []
+            )
     
     def update_job_details(self, company_name: str, job_title: str, job_description: str) -> str:
         """
@@ -123,8 +209,8 @@ class ApplyCopilotUI:
             if not self.job_details["company_name"] or not self.job_details["job_title"] or not self.job_details["job_description"]:
                 return "", None, "❌ Please fill in all job details in the Setup section"
             
-            if self.current_resume_type is None:
-                return "", None, "❌ Please index a resume first in the Setup section"
+            if self.generator.vector_store_manager.vector_store is None:
+                return "", None, "❌ Please upload and index a resume first in the Setup section"
             
             # Generate cover letter
             logger.info(f"Generating cover letter for {self.job_details['company_name']} - {self.job_details['job_title']}")
@@ -152,13 +238,14 @@ class ApplyCopilotUI:
             logger.error(error_msg)
             return "", None, error_msg
     
-    def generate_cold_message(self, contact_name: str, contact_position: str) -> tuple:
+    def generate_cold_message(self, contact_name: str, contact_position: str, resume_link: str) -> tuple:
         """
         Generate a cold message using shared job details and contact info.
         
         Args:
             contact_name: Name of the contact person
             contact_position: Position/title of the contact person
+            resume_link: Link to the resume (Google Drive or other)
         
         Returns:
             Tuple of (cold message text, file path, status message)
@@ -168,11 +255,14 @@ class ApplyCopilotUI:
             if not self.job_details["company_name"] or not self.job_details["job_title"] or not self.job_details["job_description"]:
                 return "", None, "❌ Please fill in all job details in the Setup section"
             
-            if self.current_resume_type is None:
-                return "", None, "❌ Please index a resume first in the Setup section"
+            if self.generator.vector_store_manager.vector_store is None:
+                return "", None, "❌ Please upload and index a resume first in the Setup section"
             
             if not contact_name or not contact_position:
                 return "", None, "❌ Please enter both contact name and position"
+            
+            if not resume_link:
+                return "", None, "❌ Please provide a link to your resume"
             
             # Generate cold message
             logger.info(f"Generating cold message for {contact_name} ({contact_position}) at {self.job_details['company_name']}")
@@ -182,7 +272,7 @@ class ApplyCopilotUI:
                 job_title=self.job_details["job_title"],
                 contact_name=contact_name,
                 contact_position=contact_position,
-                resume_type=self.current_resume_type
+                resume_link=resume_link
             )
             
             # Save cold message
@@ -202,26 +292,31 @@ class ApplyCopilotUI:
             logger.error(error_msg)
             return "", None, error_msg
     
-    def create_setup_section(self) -> gr.Row:
-        """Create the shared Setup section with Resume selection and Job Details."""
+    def create_setup_section(self) -> tuple:
+        """Create the shared Setup section with Resume upload and Job Details.
+        
+        Returns:
+            Tuple of (setup_row, resume_upload, company_name, job_title, job_description) for restart handling
+        """
         with gr.Row() as setup_row:
             with gr.Column(scale=1):
-                gr.Markdown("### 📋 Step 1: Select Resume Type")
-                resume_type = gr.Radio(
-                    choices=["AI Engineer", "Data Related"],
-                    label="Resume Type",
-                    value="Data Related"
+                gr.Markdown("### 📋 Step 1: Upload Resume")
+                resume_upload = gr.File(
+                    label="Upload Resume PDF",
+                    file_types=[".pdf"],
+                    type="filepath"
                 )
                 index_btn = gr.Button("📁 Index Resume", variant="primary")
+                restart_btn = gr.Button("🔄 Restart Application", variant="stop")
                 index_status = gr.Textbox(
                     label="Resume Status",
-                    value="No resume indexed yet. Please select and index a resume.",
+                    value="No resume indexed yet. Please upload a resume PDF.",
                     interactive=False
                 )
             
             with gr.Column(scale=2):
-                gr.Markdown("### 🎯 Step 2: Enter Job Details (Shared for Both Features)")
-                gr.Markdown("*These details will be used for both Cover Letter generation and Employer Q&A*")
+                gr.Markdown("### 🎯 Step 2: Enter Job Details (Shared for All Features)")
+                gr.Markdown("*These details will be used for Cover Letter generation, Employer Q&A, and Cold Message*")
                 
                 with gr.Row():
                     company_name = gr.Textbox(
@@ -251,7 +346,7 @@ class ApplyCopilotUI:
         # Event handlers for setup section
         index_btn.click(
             fn=self.index_resume,
-            inputs=[resume_type],
+            inputs=[resume_upload],
             outputs=[index_status]
         )
         
@@ -261,7 +356,7 @@ class ApplyCopilotUI:
             outputs=[job_status]
         )
         
-        return setup_row
+        return setup_row, resume_upload, index_status, job_status, company_name, job_title, job_description, restart_btn
     
     def create_cover_letter_tab(self) -> gr.Tab:
         """Create the Cover Letter Generation tab."""
@@ -314,7 +409,7 @@ class ApplyCopilotUI:
                 with gr.Column(scale=1):
                     qa_context_status = gr.Textbox(
                         label="Current Context",
-                        value="No context loaded. Please complete Step 1 and 2 in the Setup section above.",
+                        value="No context loaded. Please upload a resume and enter job details in the Setup section.",
                         interactive=False
                     )
             
@@ -370,8 +465,8 @@ class ApplyCopilotUI:
                 if not message.strip():
                     return "", history
                 
-                if self.current_resume_type is None:
-                    history.append({"role": "assistant", "content": "❌ Please load a resume first by completing Step 1 in the Setup section."})
+                if self.generator.vector_store_manager.vector_store is None:
+                    history.append({"role": "assistant", "content": "❌ Please load a resume first by uploading a PDF in the Setup section."})
                     return "", history
                 
                 try:
@@ -391,10 +486,10 @@ class ApplyCopilotUI:
             
             def update_qa_context():
                 """Update the context status display."""
-                if self.current_resume_type is None:
-                    return "❌ No resume indexed. Please complete Step 1 in the Setup section."
+                if self.generator.vector_store_manager.vector_store is None:
+                    return "❌ No resume indexed. Please upload a resume PDF in the Setup section."
                 
-                context_info = f"✅ Resume: {self.current_resume_type}"
+                context_info = "✅ Resume uploaded and indexed"
                 if self.job_details.get("job_title"):
                     context_info += f" | Job: {self.job_details['job_title']}"
                 if self.job_details.get("company_name"):
@@ -425,7 +520,7 @@ class ApplyCopilotUI:
                 outputs=[chatbot]
             )
         
-        return tab
+        return tab, chatbot, qa_context_status
     
     def create_cold_message_tab(self) -> gr.Tab:
         """Create the Cold Message / Outreach tab."""
@@ -452,6 +547,12 @@ class ApplyCopilotUI:
                         info="Their role (helps tailor the message tone)"
                     )
                     
+                    resume_link = gr.Textbox(
+                        label="Resume Link",
+                        placeholder="e.g., https://drive.google.com/file/d/...",
+                        info="Link to your resume (Google Drive or other)"
+                    )
+                    
                     generate_btn = gr.Button("✨ Generate Cold Message", variant="primary")
             
             gr.Markdown("---")
@@ -473,7 +574,7 @@ class ApplyCopilotUI:
             # Event handlers
             generate_btn.click(
                 fn=self.generate_cold_message,
-                inputs=[contact_name, contact_position],
+                inputs=[contact_name, contact_position, resume_link],
                 outputs=[cold_message_output, file_output, generation_status]
             )
         
@@ -486,14 +587,14 @@ class ApplyCopilotUI:
             gr.Markdown("# 🤖 ApplyCopilot")
             gr.Markdown(
                 "**Your intelligent job application assistant.** "
-                "Generate personalized cover letters and answer employer questions based on your resume."
+                "Upload any resume and generate personalized cover letters and answer employer questions."
             )
             
             # Setup Section (Shared across all features)
             with gr.Column():
                 gr.Markdown("## 🔧 Setup")
-                gr.Markdown("*Complete these steps first. Your selections will be shared across all features (Cover Letter Generator, Employer Q&A, and Cold Message).")
-                self.create_setup_section()
+                gr.Markdown("*Complete these steps first. Upload your resume and enter job details to get started.*")
+                setup_row, resume_upload, index_status, job_status, company_name, job_title, job_description, restart_btn = self.create_setup_section()
             
             gr.Markdown("---")
             
@@ -501,12 +602,27 @@ class ApplyCopilotUI:
             gr.Markdown("## 🚀 Features")
             with gr.Tabs():
                 self.create_cover_letter_tab()
-                self.create_employer_qa_tab()
+                qa_tab, qa_chatbot, qa_context_status = self.create_employer_qa_tab()
                 self.create_cold_message_tab()
             
             gr.Markdown("---")
             gr.Markdown(
                 f"*Powered by AI • Built for {CANDIDATE_NAME}*"
+            )
+            
+            # Connect restart button to clear all UI components
+            restart_btn.click(
+                fn=self.restart_application,
+                outputs=[
+                    index_status,       # Status message
+                    job_status,         # Job status
+                    qa_context_status,  # QA context status
+                    resume_upload,      # Clear file upload
+                    company_name,       # Clear company name
+                    job_title,          # Clear job title
+                    job_description,    # Clear job description
+                    qa_chatbot          # Clear chat history
+                ]
             )
         
         return interface

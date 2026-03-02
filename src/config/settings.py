@@ -17,7 +17,7 @@ for directory in [DATA_DIR, RESUMES_DIR, COVER_LETTER_EXAMPLES_DIR, VECTOR_STORE
 
 # Model settings
 EMBEDDING_MODEL = "text-embedding-3-small"
-LLM_MODEL = "gpt-4.1-mini"
+LLM_MODEL = "claude-sonnet-4-6"  # Anthropic Claude Sonnet 4.6
 
 # Vector store settings
 CHUNK_SIZE = 350

@@ -163,29 +163,6 @@ def get_employer_qa_system_prompt(job_context: str = None, job_description: str 
         return EMPLOYER_QA_SYSTEM_PROMPT_BASE
 
 
-def get_employer_qa_prompt(context: str, question: str) -> str:
-    """
-    Get the employer Q&A prompt with context and question (legacy function).
-    
-    Args:
-        context: The retrieved resume context
-        question: The employer's question
-    
-    Returns:
-        Formatted prompt for the LLM
-    """
-    return f"""{EMPLOYER_QA_SYSTEM_PROMPT_BASE}
-
-**Resume Context:**
-{context}
-
-**Employer's Question:**
-{question}
-
-**Your Response:**
-Please provide a helpful, professional answer to the employer's question based on the resume context above."""
-
-
 # Cold Message / Outreach Message Prompt
 COLD_MESSAGE_TEMPLATE = """You are an expert at writing concise, engaging cold messages and LinkedIn connection requests for job seekers in technical fields.
 

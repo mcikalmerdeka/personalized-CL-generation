@@ -139,7 +139,6 @@ cd ApplyCopilot
    OPENAI_API_KEY=your_openai_api_key
    ```
 5. Ensure your documents are in place:
-   - Resumes: `data/resumes/` (ai_engineer_resume.pdf, data_related_resume.pdf)
    - Cover letter examples: `data/cover_letter_examples/` (example PDFs)
 6. **(Optional)** Set your name in `src/config/settings.py`:
    - Edit `CANDIDATE_NAME = "Muhammad Cikal Merdeka"` to your full name for proper signature in generated cover letters
@@ -162,13 +161,14 @@ This will launch the Gradio web interface at `http://127.0.0.1:7860`
 
 Before using any features, complete the Setup section at the top:
 
-1. **Select Resume Type**: Choose between "AI Engineer" or "Data Related" resume
-2. **Index Resume**: Click "📁 Index Resume" to create/load the vector store
-3. **Enter Job Details** (shared for all features):
+1. **Upload Resume**: Upload your resume PDF file using the file upload component
+2. **Index Resume**: Click "📁 Index Resume" to process and index the uploaded resume
+3. **Restart if needed**: Click "🔄 Restart Application" to clear all data and start fresh
+4. **Enter Job Details** (shared for all features):
    - Company Name
    - Job Title
    - Full Job Description
-4. **Save Job Details**: Click "💾 Save Job Details" to make them available to both features
+5. **Save Job Details**: Click "💾 Save Job Details" to make them available to all features
 
 #### Tab 1: 📝 Cover Letter Generator
 
@@ -216,9 +216,8 @@ from src.core.vector_store import VectorStoreManager
 generator = CoverLetterGenerator()
 vector_store = VectorStoreManager()
 
-# Load and index resume
-vector_store.load_and_index_resume("data/resumes/data_related_resume.pdf")
-vector_store.save_vector_store("data/vector_stores/data_related")
+# Load and index resume from uploaded file
+vector_store.load_and_index_resume("path/to/your/resume.pdf")
 
 # Assign to generator
 generator.vector_store_manager = vector_store
@@ -252,9 +251,8 @@ from src.core.vector_store import VectorStoreManager
 generator = CoverLetterGenerator()
 vector_store = VectorStoreManager()
 
-# Load and index resume
-vector_store.load_and_index_resume("data/resumes/ai_engineer_resume.pdf")
-vector_store.save_vector_store("data/vector_stores/ai_engineer")
+# Load and index resume from uploaded file
+vector_store.load_and_index_resume("path/to/your/resume.pdf")
 
 # Assign to generator
 generator.vector_store_manager = vector_store
@@ -266,7 +264,7 @@ cold_message = generator.generate_cold_message(
     job_title="Position Title",
     contact_name="John Smith",
     contact_position="Tech Lead",
-    resume_type="AI Engineer"
+    resume_link="https://drive.google.com/your-resume-link"
 )
 
 # Save output
@@ -283,7 +281,7 @@ from src.core.vector_store import VectorStoreManager
 
 # Initialize components
 vector_store = VectorStoreManager()
-vector_store.load_and_index_resume("data/resumes/ai_engineer_resume.pdf")
+vector_store.load_and_index_resume("path/to/your/resume.pdf")
 
 chatbot = EmployerQAChatbot(vector_store)
 

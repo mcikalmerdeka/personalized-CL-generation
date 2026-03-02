@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from typing import Optional
 from langchain_community.document_loaders import PyPDFLoader
-from langchain_openai import ChatOpenAI
+from langchain_anthropic import ChatAnthropic
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from reportlab.lib.pagesizes import letter
@@ -31,7 +31,7 @@ class CoverLetterGenerator:
         Args:
             llm_model: LLM model name to use
         """
-        self.llm = ChatOpenAI(model=llm_model)
+        self.llm = ChatAnthropic(model=llm_model, temperature=0.7)
         self.vector_store_manager = VectorStoreManager()
         self.cover_letter_examples = []
         logger.info(f"Initialized CoverLetterGenerator with LLM model: {llm_model}")

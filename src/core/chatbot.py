@@ -4,12 +4,12 @@ Handles conversations with employers/recruiters based on indexed resume.
 """
 
 from typing import List, Dict, Any, Optional
-from langchain_openai import ChatOpenAI
+from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 
 from src.config.logging_config import setup_logger
 from src.config.settings import LLM_MODEL, CANDIDATE_NAME
-from src.config.prompts import get_employer_qa_prompt, get_employer_qa_system_prompt
+from src.config.prompts import get_employer_qa_system_prompt
 
 logger = setup_logger(__name__)
 
@@ -25,7 +25,7 @@ class EmployerQAChatbot:
             vector_store_manager: VectorStoreManager instance with loaded resume
             llm_model: LLM model name to use
         """
-        self.llm = ChatOpenAI(model=llm_model)
+        self.llm = ChatAnthropic(model=llm_model, temperature=0.7)
         self.vector_store_manager = vector_store_manager
         self.chat_history: List[Dict[str, str]] = []
         self.candidate_name = CANDIDATE_NAME

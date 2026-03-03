@@ -28,7 +28,7 @@ Your task is to create a personalized cover letter using the following informati
 6. Demonstrate understanding of the company and role
 7. Keep the language clear, concise, and impactful
 8. Ensure the cover letter does NOT exceed {max_words} words (maximum for a single-page document)
-9. End with a proper sign-off (e.g. "Best regards,") followed by the candidate's full name: **{candidate_name}**. Do not use "[Your Name]" or any placeholder—always use the actual name given above.
+9. End with a proper sign-off (e.g. "Best regards,") followed by the candidate's full name: **{candidate_name}**. Do not use "[Your Name]" or any placeholder; always use the actual name given above.
 
 **Key Style Elements to Follow:**
 - Use a formal but engaging tone
@@ -184,7 +184,7 @@ Your task is to create a professional cold message following the EXACT format an
 ```
 Hey [Contact Person], saw [Company Name] is hiring for [Position Name].
 
-Noticed you're looking for someone with experience in [mention 1-2 key requirements from the job post]. I've been doing exactly that — currently building production RAG systems and agentic AI pipelines at 80&Company, where I brought document extraction accuracy from 58% to 100% for an automotive client. Stack includes LangChain, FastAPI, Next.js, PostgreSQL, and more.
+Noticed you're looking for someone with experience in [mention 1-2 key requirements from the job post]. I've been doing exactly that: currently building production RAG systems and agentic AI pipelines at 80&Company, where I brought document extraction accuracy from 58% to 100% for an automotive client. Stack includes LangChain, FastAPI, Next.js, PostgreSQL, and more.
 
 Already applied through the portal, but wanted to reach out directly in case it helps move things along. Dropping my links here so you can have a closer look.
 
@@ -200,7 +200,7 @@ Muhammad Cikal Merdeka
 ```
 Hey [Contact Person], saw [Company Name] is hiring for [Position Name].
 
-Noticed you're looking for someone with experience in [mention 1-2 key requirements from the job post]. That's pretty much what I've been doing — at Evermos I automated reconciliation for millions of monthly transactions using Python, SQL, and Snowflake, resolving 95% of cross-system discrepancies. I've also built dashboards in Looker Studio, Power BI, and Preset, and worked across dbt and Airflow for analytics engineering.
+Noticed you're looking for someone with experience in [mention 1-2 key requirements from the job post]. That's pretty much what I've been doing: at Evermos I automated reconciliation for millions of monthly transactions using Python, SQL, and Snowflake, resolving 95% of cross-system discrepancies. I've also built dashboards in Looker Studio, Power BI, and Preset, and worked across dbt and Airflow for analytics engineering.
 
 Already applied through the portal, but wanted to reach out directly in case it helps. Dropping my links here so you can have a closer look.
 
@@ -221,8 +221,8 @@ Muhammad Cikal Merdeka
    - Analyze the job description and identify 1-2 most important technical requirements
 
 3. **Experience Paragraph (Line 4)**: 
-   - For AI roles: Start with "I've been doing exactly that —" then mention specific achievements from resume context (production systems, specific metrics like "58% to 100%", tech stack)
-   - For Data roles: Start with "That's pretty much what I've been doing —" then mention data engineering/analytics achievements (Python, SQL, specific tools, metrics like "millions of transactions", "95% resolved")
+   - For AI roles: Start with "I've been doing exactly that:" then mention specific achievements from resume context (production systems, specific metrics like "58% to 100%", tech stack)
+   - For Data roles: Start with "That's pretty much what I've been doing:" then mention data engineering/analytics achievements (Python, SQL, specific tools, metrics like "millions of transactions", "95% resolved")
    - Include specific company names, metrics, and tech stack from the resume context
    - Keep it to ONE compelling paragraph highlighting the most relevant experience
 

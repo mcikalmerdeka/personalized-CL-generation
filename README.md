@@ -18,16 +18,16 @@ An intelligent tool that helps you throughout your job application process. Appl
 
 ### 📝 Cover Letter Generator
 
-- **Dual Resume Support**: Supports both AI Engineer and Data-related role resumes
-- **Resume Analysis**: Automatically extracts relevant skills and experiences using FAISS vector search
+- **Hybrid Context System**: Uses direct context injection for resumes and RAG (Retrieval-Augmented Generation) for portfolio projects
+- **Portfolio Integration**: Optional portfolio upload to showcase relevant projects with semantic search
 - **Style Matching**: Learns from multiple cover letter examples to maintain consistent writing style
 - **Job-Specific Customization**: Tailors content to match specific job requirements
 - **PDF & Text Export**: Creates professional documents in multiple formats
 
 ### 💬 Employer Q&A Assistant
 
-- **Interactive Chatbot**: Answer employer and recruiter questions based on your indexed resume and job context
-- **Context-Aware Responses**: Uses RAG (Retrieval-Augmented Generation) to provide accurate answers from your resume
+- **Interactive Chatbot**: Answer employer and recruiter questions based on your resume and portfolio context
+- **Context-Aware Responses**: Combines full resume text with relevant portfolio projects retrieved via semantic search
 - **Job-Specific Tailoring**: When job details are saved, responses are tailored to the specific position and company
 - **Professional Tone**: Maintains a professional and helpful tone in all responses
 - **Practice Mode**: Includes example questions to help you prepare for interviews
@@ -43,18 +43,20 @@ An intelligent tool that helps you throughout your job application process. Appl
 
 ### 🎨 User Interface
 
-- **Setup-First Workflow**: Centralized Setup section for selecting resume type and entering job details (shared across all features)
-- **Tabbed Features**: Easy switching between Cover Letter Generator and Employer Q&A modes
-- **Shared State**: Resume and job details persist across tabs - no need to re-enter information
+- **Setup-First Workflow**: Centralized Setup section for uploading documents and entering job details (shared across all features)
+- **Optional Portfolio Upload**: Upload a TXT file with your portfolio/projects to enhance context
+- **Tabbed Features**: Easy switching between Cover Letter Generator, Employer Q&A, and Cold Message modes
+- **Shared State**: Resume, portfolio, and job details persist across tabs - no need to re-enter information
 - **Web-Based**: User-friendly Gradio interface accessible in your browser
 - **Real-time Feedback**: Status messages and progress indicators
 
 ## 🛠️ Implementation Details
 
 - Built with **LangChain** for document processing and LLM integration
-- Uses **FAISS** for efficient vector storage and semantic search
-- Leverages **OpenAI Embeddings** for text analysis (text-embedding-3-small)
-- **GPT-4o Mini** for cover letter generation and chat responses
+- **Hybrid Context Approach**: Direct injection for resumes (full text) + RAG for portfolios (semantic search)
+- Uses **FAISS** for efficient vector storage of portfolio projects
+- Leverages **OpenAI Embeddings** for portfolio semantic search (text-embedding-3-small)
+- **Claude Sonnet 4.6** via Anthropic API for cover letter generation and chat responses
 - **Gradio** web interface with tabbed navigation
 - Implements **ReportLab** for PDF document generation
 - **Centralized Logging** for application monitoring
@@ -65,34 +67,41 @@ An intelligent tool that helps you throughout your job application process. Appl
 ### Cover Letter Generation
 
 1. **Document Processing**:
-   - Loads your resume from PDF
-   - Splits content into manageable chunks
-   - Creates vector embeddings for semantic search
+   - Loads your resume from PDF (uses full text - direct injection)
+   - Optionally loads your portfolio from TXT (uses semantic search - RAG)
+   - Analyzes cover letter examples for style reference
 
-2. **Style Learning**:
+2. **Hybrid Context Assembly**:
+   - **Resume**: Injected directly into context as full text for complete work history
+   - **Portfolio**: Relevant projects retrieved via semantic search to match job requirements
+   - This hybrid approach ensures complete resume coverage while highlighting most relevant projects
+
+3. **Style Learning**:
    - Analyzes your existing cover letters for tone and format
    - Extracts structural elements and writing patterns
 
-3. **Content Generation**:
-   - Retrieves relevant resume sections based on job description
-   - Generates tailored content using LLM (GPT-4.1 Mini)
+4. **Content Generation**:
+   - Combines resume text with relevant portfolio projects based on job description
+   - Generates tailored content using Claude Sonnet 4.6
+   - References specific portfolio projects that demonstrate relevant experience
    - Maintains your personal writing style and format
 
-4. **Document Creation**:
+5. **Document Creation**:
    - Formats content with professional styling
    - Outputs a ready-to-submit PDF or TXT document
 
 ### Employer Q&A Assistant
 
-1. **Resume Indexing**:
-    - Indexes your resume into a searchable vector store
-    - Creates semantic embeddings for efficient retrieval
-    - Job details are saved separately to provide context
+1. **Context Preparation**:
+    - Resume text stored for direct injection (no RAG - complete context)
+    - Portfolio indexed with semantic embeddings for RAG retrieval (when uploaded)
+    - Job details saved separately to provide context
 
 2. **Question Answering**:
-    - Retrieves relevant context from your resume based on the question
+    - Uses full resume text as primary context for complete information
+    - Retrieves relevant portfolio projects via semantic search when applicable
     - Considers job context (company name, position) to tailor responses
-    - Generates professional responses using the retrieved information
+    - Generates professional responses using Claude Sonnet 4.6
     - When job details are available, emphasizes fit for the specific role
     - Maintains conversation history for context-aware responses
 
@@ -108,10 +117,10 @@ An intelligent tool that helps you throughout your job application process. Appl
     - The position helps tailor the message tone (formal for HR, technical for engineers)
 
 2. **Message Generation**:
-    - Retrieves relevant skills and experiences from your resume
+    - Uses full resume context combined with relevant portfolio projects
     - Creates a concise 150-200 word message highlighting your fit for the role
-    - Automatically includes your resume link (AI or Data version based on selection)
-    - Adds GitHub and personal website links at the end
+    - Automatically includes your resume, GitHub, and personal website links
+    - Follows proven templates for AI Engineering and Data roles
 
 3. **Professional Formatting**:
     - Generates a friendly yet professional greeting
@@ -152,8 +161,9 @@ cd ApplyCopilot
    ```
 5. Ensure your documents are in place:
    - Cover letter examples: `data/cover_letter_examples/` (example PDFs)
-6. **(Optional)** Set your name in `src/config/settings.py`:
-   - Edit `CANDIDATE_NAME = "Muhammad Cikal Merdeka"` to your full name for proper signature in generated cover letters
+6. **(Optional)** Customize your settings in `src/config/settings.py`:
+   - Edit `CANDIDATE_NAME = "Muhammad Cikal Merdeka"` to your full name for proper signature
+   - Update `RESUME_AI_LINK`, `RESUME_DATA_LINK`, `GITHUB_LINK`, `WEBSITE_LINK` with your links
 
 ## 🚀 Usage
 
@@ -169,13 +179,21 @@ This will launch the Gradio web interface at `http://127.0.0.1:7860`
 
 ### Using the Web Interface
 
-#### 🔧 Step 1: Setup (Complete This First)
+#### 🔧 Setup (Complete This First)
 
 Before using any features, complete the Setup section at the top:
 
-1. **Upload Resume**: Upload your resume PDF file using the file upload component
-2. **Index Resume**: Click "📁 Index Resume" to process and index the uploaded resume
+1. **Upload Resume (Required)**: Upload your resume PDF file
+   - Click "📁 Index Resume" to process the resume
+   - Uses direct context injection (full resume text)
+
+2. **Upload Portfolio (Optional)**: Upload a TXT file with your portfolio/projects
+   - Click "📁 Index Portfolio" to process the portfolio
+   - Uses RAG for semantic retrieval of relevant projects
+   - Include project descriptions, technologies used, and outcomes
+
 3. **Restart if needed**: Click "🔄 Restart Application" to clear all data and start fresh
+
 4. **Enter Job Details** (shared for all features):
    - Company Name
    - Job Title
@@ -222,19 +240,17 @@ After completing Setup:
 
 ```python
 from src.core.generator import CoverLetterGenerator
-from src.core.vector_store import VectorStoreManager
 
-# Initialize components
+# Initialize generator
 generator = CoverLetterGenerator()
-vector_store = VectorStoreManager()
 
-# Load and index resume from uploaded file
-vector_store.load_and_index_resume("path/to/your/resume.pdf")
+# Load resume (direct injection - full text)
+generator.vector_store_manager.load_and_index_resume("path/to/your/resume.pdf")
 
-# Assign to generator
-generator.vector_store_manager = vector_store
+# Load portfolio (optional - RAG for project retrieval)
+generator.load_portfolio("path/to/your/portfolio.txt")
 
-# Load examples
+# Load cover letter examples for style matching
 generator.load_cover_letter_examples()
 
 # Generate cover letter
@@ -257,17 +273,15 @@ file_path = generator.save_cover_letter(
 
 ```python
 from src.core.generator import CoverLetterGenerator
-from src.core.vector_store import VectorStoreManager
 
-# Initialize components
+# Initialize generator (automatically loads links from settings)
 generator = CoverLetterGenerator()
-vector_store = VectorStoreManager()
 
-# Load and index resume from uploaded file
-vector_store.load_and_index_resume("path/to/your/resume.pdf")
+# Load resume
+generator.vector_store_manager.load_and_index_resume("path/to/your/resume.pdf")
 
-# Assign to generator
-generator.vector_store_manager = vector_store
+# Optionally load portfolio
+generator.load_portfolio("path/to/your/portfolio.txt")
 
 # Generate cold message
 cold_message = generator.generate_cold_message(
@@ -287,15 +301,18 @@ file_path = generator.save_cold_message(
 )
 ```
 
+**Employer Q&A Chatbot**:
+
 ```python
 from src.core.chatbot import EmployerQAChatbot
-from src.core.vector_store import VectorStoreManager
+from src.core.generator import CoverLetterGenerator
 
-# Initialize components
-vector_store = VectorStoreManager()
-vector_store.load_and_index_resume("path/to/your/resume.pdf")
+# Initialize via generator for shared context
+generator = CoverLetterGenerator()
+generator.vector_store_manager.load_and_index_resume("path/to/your/resume.pdf")
+generator.load_portfolio("path/to/your/portfolio.txt")
 
-chatbot = EmployerQAChatbot(vector_store)
+chatbot = EmployerQAChatbot(generator.vector_store_manager)
 
 # Answer employer questions
 response = chatbot.chat(
@@ -311,20 +328,21 @@ print(response)
 ├── app.py                         # Main application entry point
 ├── src/
 │   ├── config/
-│   │   ├── settings.py            # Application configuration (paths, model, CANDIDATE_NAME)
+│   │   ├── settings.py            # Application configuration (paths, model, CANDIDATE_NAME, links)
 │   │   ├── logging_config.py      # Centralized logging setup
-│   │   └── prompts.py             # LLM prompt templates (cover letter + Q&A)
+│   │   └── prompts.py             # LLM prompt templates
 │   ├── core/
 │   │   ├── generator.py           # Cover letter and cold message generation logic
 │   │   ├── chatbot.py             # Employer Q&A chatbot handler
-│   │   └── vector_store.py        # FAISS vector store management
+│   │   └── vector_store.py        # Hybrid: direct injection (resume) + RAG (portfolio)
 │   └── ui/
 │       └── gradio_interface.py    # Gradio web interface with tabs
 ├── data/
-│   ├── resumes/                   # Resume PDF files
-│   ├── cover_letter_examples/     # Example cover letters
-│   ├── vector_stores/             # FAISS indices (auto-generated)
-│   └── output/                    # Generated cover letters
+│   ├── resumes/                   # Uploaded resume PDF files
+│   ├── cover_letter_examples/     # Example cover letters for style matching
+│   ├── vector_stores/             # FAISS indices for portfolio (auto-generated)
+│   └── output/                    # Generated cover letters and cold messages
+├── assets/                        # Static assets (logos, images)
 ├── requirements.txt               # Python dependencies
 ├── pyproject.toml                 # Project metadata
 └── README.md                      # This file
@@ -334,10 +352,14 @@ print(response)
 
 - Ensure your `.env` file with API keys is not committed to version control
 - The quality of generated content depends on:
-  - The completeness of your resume
+  - The completeness of your resume and portfolio
   - The quality of your existing cover letter templates
   - The specificity of the job description
-- The chatbot can only answer questions based on information present in your indexed resume
+- **Resume vs Portfolio Approach**:
+  - Resume uses direct context injection (complete text) for accurate representation
+  - Portfolio uses RAG (semantic search) to highlight most relevant projects
+  - Without a portfolio, the system works with resume only
+- Portfolio file should be a plain text (.txt) file with project descriptions
 
 ## 🔒 Privacy
 

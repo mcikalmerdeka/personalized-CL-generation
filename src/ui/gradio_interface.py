@@ -733,7 +733,7 @@ class ApplyCopilotUI:
 def main():
     """Main entry point for the UI."""
     ui = ApplyCopilotUI()
-    ui.launch(share=False, server_name="127.0.0.1", server_port=7860)
+    ui.launch(share=False, server_name="0.0.0.0", server_port=7860)
 
 
 if __name__ == "__main__":

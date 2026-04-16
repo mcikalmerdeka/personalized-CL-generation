@@ -12,6 +12,10 @@ pinned: false
 
 # ApplyCopilot - Your AI Job Application Assistant
 
+<p align="center">
+  <img src="assets/Apply Copilot.png" alt="Apply Copilot Logo" height="180" />
+</p>
+
 An intelligent tool that helps you throughout your job application process. ApplyCopilot creates tailored cover letters for specific job openings and helps you answer employer questions based on your resume, powered by AI.
 
 ## 🚀 Features
@@ -93,41 +97,41 @@ An intelligent tool that helps you throughout your job application process. Appl
 ### Employer Q&A Assistant
 
 1. **Context Preparation**:
-    - Resume text stored for direct injection (no RAG - complete context)
-    - Portfolio indexed with semantic embeddings for RAG retrieval (when uploaded)
-    - Job details saved separately to provide context
+   - Resume text stored for direct injection (no RAG - complete context)
+   - Portfolio indexed with semantic embeddings for RAG retrieval (when uploaded)
+   - Job details saved separately to provide context
 
 2. **Question Answering**:
-    - Uses full resume text as primary context for complete information
-    - Retrieves relevant portfolio projects via semantic search when applicable
-    - Considers job context (company name, position) to tailor responses
-    - Generates professional responses using Claude Sonnet 4.6
-    - When job details are available, emphasizes fit for the specific role
-    - Maintains conversation history for context-aware responses
+   - Uses full resume text as primary context for complete information
+   - Retrieves relevant portfolio projects via semantic search when applicable
+   - Considers job context (company name, position) to tailor responses
+   - Generates professional responses using Claude Sonnet 4.6
+   - When job details are available, emphasizes fit for the specific role
+   - Maintains conversation history for context-aware responses
 
 3. **Interactive Chat**:
-    - Real-time chat interface with employers/recruiters
-    - Example questions to practice your responses
-    - Easy conversation management (clear, save)
+   - Real-time chat interface with employers/recruiters
+   - Example questions to practice your responses
+   - Easy conversation management (clear, save)
 
 ### Cold Message Generator
 
 1. **Contact Information**:
-    - Enter the contact person's name and position (e.g., HR Manager, Tech Lead)
-    - The position helps tailor the message tone (formal for HR, technical for engineers)
+   - Enter the contact person's name and position (e.g., HR Manager, Tech Lead)
+   - The position helps tailor the message tone (formal for HR, technical for engineers)
 
 2. **Message Generation**:
-    - Uses full resume context combined with relevant portfolio projects
-    - Creates a concise 150-200 word message highlighting your fit for the role
-    - Automatically includes your resume, GitHub, and personal website links
-    - Follows proven templates for AI Engineering and Data roles
+   - Uses full resume context combined with relevant portfolio projects
+   - Creates a concise 150-200 word message highlighting your fit for the role
+   - Automatically includes your resume, GitHub, and personal website links
+   - Follows proven templates for AI Engineering and Data roles
 
 3. **Professional Formatting**:
-    - Generates a friendly yet professional greeting
-    - Clearly states your interest in the position
-    - Highlights 2-3 relevant skills that match the job requirements
-    - Includes a clear call-to-action for next steps
-    - Formatted for easy copy-paste into LinkedIn messages or emails
+   - Generates a friendly yet professional greeting
+   - Clearly states your interest in the position
+   - Highlights 2-3 relevant skills that match the job requirements
+   - Includes a clear call-to-action for next steps
+   - Formatted for easy copy-paste into LinkedIn messages or emails
 
 ## 📋 Requirements
 
